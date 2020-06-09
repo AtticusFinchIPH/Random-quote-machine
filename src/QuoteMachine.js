@@ -1,43 +1,52 @@
 import React from 'react';
 import './QuoteMachine.css';
+import $ from 'jquery'
 
-const quoteList = [
-    {
-        text: "Hello World!",
-        author: "Anonymous"
-    },
-    {
-        text: "I love JS",
-        author: "Anfred Nobel"
-    },
-    {
-        text: "I'm hungry",
-        author: "Emmanuel Macron"
-    }
-]
+let quotesData;
+
+function getQuotes() {
+    return $.ajax({
+        headers: {
+          Accept: "application/json"
+        },
+        url: 'https://gist.githubusercontent.com/camperbot/5a022b72e96c4c9585c32bf6a75f62d9/raw/e3c6895ce42069f0ee7e991229064f167fe8ccdc/quotes.json',
+        success: function(jsonQuotes) {
+          if (typeof jsonQuotes === 'string') {
+            quotesData = JSON.parse(jsonQuotes);
+            console.log('quotesData');
+            console.log(quotesData);
+          }
+        }
+      });
+}
 
 class QuoteMachine extends React.Component{
     constructor(props){
         super(props);
         this.state = {
-            text: "Hello There!",
+            quote: "Hello There!",
             author: "Here",
         }
         this.newQuote = this.newQuote.bind(this);
+        this.getQuote = this.getQuote.bind(this);
     }
     newQuote(){
-        let num = Math.floor(Math.random() * 3);
-        let newQuote = quoteList[num];
+        this.getQuote();
+    }
+    getQuote(){
+        let num = Math.floor(Math.random() * quotesData.quotes.length);
+        let newQuote = quotesData.quotes[num];
         this.setState({
-            text: newQuote.text,
+            quote: newQuote.quote,
             author: newQuote.author
         })
     }
     render(){
+        getQuotes();
         return(
             <div id='quote-box'>
                 <div id='quote-show'>
-                    <div><i className='fa fa-quote-left'></i> <span id='text'>{this.state.text}</span></div>
+                    <div><i className='fa fa-quote-left'></i> <span id='text'>{this.state.quote}</span></div>
                     <div id='author'>- <span>{this.state.author}</span></div>
                 </div>
                 <div id='quote-actions'>
