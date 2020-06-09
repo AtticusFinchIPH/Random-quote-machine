@@ -2,23 +2,7 @@ import React from 'react';
 import './QuoteMachine.css';
 import $ from 'jquery'
 
-let quotesData;
-
-function getQuotes() {
-    return $.ajax({
-        headers: {
-          Accept: "application/json"
-        },
-        url: 'https://gist.githubusercontent.com/camperbot/5a022b72e96c4c9585c32bf6a75f62d9/raw/e3c6895ce42069f0ee7e991229064f167fe8ccdc/quotes.json',
-        success: function(jsonQuotes) {
-          if (typeof jsonQuotes === 'string') {
-            quotesData = JSON.parse(jsonQuotes);
-            console.log('quotesData');
-            console.log(quotesData);
-          }
-        }
-      });
-}
+let quotesList;
 
 class QuoteMachine extends React.Component{
     constructor(props){
@@ -34,15 +18,24 @@ class QuoteMachine extends React.Component{
         this.getQuote();
     }
     getQuote(){
-        let num = Math.floor(Math.random() * quotesData.quotes.length);
-        let newQuote = quotesData.quotes[num];
+        let num = Math.floor(Math.random() * quotesList.length);
+        let newQuote = quotesList[num];
         this.setState({
             quote: newQuote.quote,
             author: newQuote.author
         })
     }
+    componentDidMount(){
+        fetch("https://gist.githubusercontent.com/camperbot/5a022b72e96c4c9585c32bf6a75f62d9/raw/e3c6895ce42069f0ee7e991229064f167fe8ccdc/quotes.json")
+        .then(response =>  
+            response.json())
+        .then((jsonQuotes) => {
+            quotesList = jsonQuotes.quotes;
+            console.log(quotesList);
+            this.getQuote();
+        })
+    }
     render(){
-        getQuotes();
         return(
             <div id='quote-box'>
                 <div id='quote-show'>
